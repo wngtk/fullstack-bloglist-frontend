@@ -59,12 +59,26 @@ const App = () => {
     )
   }
 
+  async function handleCreate(e) {
+    e.preventDefault()
+    console.log('creating blog list')
+  }
+
   return (
     <div>
         <h2>blogs</h2>
       { user &&
       <p>{user.username} logged in <button>logout</button></p>
       }
+      <div>
+        <h2>create new</h2>
+        <form onSubmit={handleCreate}>
+          <p>title:<input type="text" /></p>
+          <p>author: <input type="text"/></p>
+          <p>url: <input type="text"/></p>
+          <button>create</button>
+        </form>
+      </div>
         {blogs.map(blog =>
             <Blog key={blog.id} blog={blog}/>
         )}
