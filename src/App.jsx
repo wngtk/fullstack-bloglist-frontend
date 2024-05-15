@@ -8,8 +8,9 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  // const [loading, setLoading] = useState(true)
-  // const [error, setError] = useState(false)
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -18,9 +19,11 @@ const App = () => {
   }, [])
 
   useEffect(() => {
-    const user = window.localStorage.getItem('blogListsLoggedUser')
-    if (user) {
-      setUser(JSON.parse(user))
+    const loggedUserJSON = window.localStorage.getItem('blogListsLoggedUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
     }
   }, []);
 
@@ -61,21 +64,34 @@ const App = () => {
 
   async function handleCreate(e) {
     e.preventDefault()
-    console.log('creating blog list')
+    console.log('creating blog list', title, author, url)
+    try {
+      await blogService.create({
+        title: title,
+        author: author,
+        url: url
+      })
+      setTitle('')
+      setAuthor('')
+      setUrl('')
+    } catch (e) {
+      console.log('creation fails', e)
+    }
   }
 
   return (
     <div>
         <h2>blogs</h2>
-      { user &&
-      <p>{user.username} logged in <button>logout</button></p>
+      {
+        user &&
+        <p>{user.username} logged in <button>logout</button></p>
       }
       <div>
         <h2>create new</h2>
         <form onSubmit={handleCreate}>
-          <p>title:<input type="text" /></p>
-          <p>author: <input type="text"/></p>
-          <p>url: <input type="text"/></p>
+          <p>title:<input type="text" value={title} onChange={({target}) => setTitle(target.value)} /></p>
+          <p>author: <input type="text" value={author} onChange={({target}) => setAuthor(target.value)}/></p>
+          <p>url: <input type="text" value={url} onChange={({target}) => setUrl(target.value)}/></p>
           <button>create</button>
         </form>
       </div>
