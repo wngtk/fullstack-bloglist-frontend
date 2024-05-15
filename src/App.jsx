@@ -142,6 +142,14 @@ const App = () => {
       })
   }
 
+  const handleLike = async (id) => {
+    setBlogs(blogs.map(blog => {
+      return blog.id === id ? {...blog, likes: blog.likes + 1} : blog
+    }))
+    const returnBlog = await blogService.like(blogs.find(blog => blog.id === id))
+    console.log("like", returnBlog);
+  }
+
   return (
     <div>
       <h2>blogs</h2>
@@ -157,7 +165,7 @@ const App = () => {
         <BlogForm createBlog={addBlog} />
       </Toggleable>
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog}/>
+        <Blog key={blog.id} blog={blog} onLikeClick={() => handleLike(blog.id)}/>
       )}
     </div>
   )

@@ -1,14 +1,10 @@
-import React from "react";
+import { useState } from "react";
 
-const Blog = ({ blog }) => {
-  const [show, setShow] = React.useState(false);
+const Blog = ({ blog, onLikeClick }) => {
+  const [show, setShow] = useState(false);
 
   const toggle = () => {
     setShow(!show);
-  }
-
-  const handleLike = () => {
-    console.log("like");
   }
 
   return (
@@ -18,7 +14,7 @@ const Blog = ({ blog }) => {
         show &&
         <div>
           <p>{blog.url}</p>
-          <p>likes {blog.like} <button onClick={handleLike}>like</button></p>
+          <p>likes {blog.likes} <button onClick={onLikeClick}>like</button></p>
           <p>{blog.author}</p>
         </div>
       }
