@@ -2,6 +2,11 @@ import {useEffect, useState} from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import './index.css'
+
+function Notification({value}) {
+  return <div className="notification">{value}</div>;
+}
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -11,6 +16,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  const [notification, setNotification] = useState(false)
+  const [noteText, setNoteText] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -42,6 +49,9 @@ const App = () => {
       setPassword('')
     } catch (e) {
       console.log('Wrong credentials', e)
+      setNotification(true)
+      setNoteText('wrong username or password')
+      setTimeout(() => { setNotification(false) }, 3000)
     }
   }
 
@@ -71,9 +81,12 @@ const App = () => {
         author: author,
         url: url
       })
+      setNotification(true)
+      setNoteText(`a new blog ${title} by ${author} added`)
       setTitle('')
       setAuthor('')
       setUrl('')
+      setTimeout(() => { setNotification(false) }, 3000)
     } catch (e) {
       console.log('creation fails', e)
     }
@@ -81,7 +94,11 @@ const App = () => {
 
   return (
     <div>
-        <h2>blogs</h2>
+      <h2>blogs</h2>
+      {
+        notification &&
+        <Notification value={noteText} />
+      }
       {
         user &&
         <p>{user.username} logged in <button>logout</button></p>
@@ -89,15 +106,15 @@ const App = () => {
       <div>
         <h2>create new</h2>
         <form onSubmit={handleCreate}>
-          <p>title:<input type="text" value={title} onChange={({target}) => setTitle(target.value)} /></p>
+          <p>title:<input type="text" value={title} onChange={({target}) => setTitle(target.value)}/></p>
           <p>author: <input type="text" value={author} onChange={({target}) => setAuthor(target.value)}/></p>
           <p>url: <input type="text" value={url} onChange={({target}) => setUrl(target.value)}/></p>
           <button>create</button>
         </form>
       </div>
-        {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog}/>
-        )}
+      {blogs.map(blog =>
+        <Blog key={blog.id} blog={blog}/>
+      )}
     </div>
   )
 }
