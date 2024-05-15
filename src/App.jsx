@@ -1,8 +1,9 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
+import Toggleable from "./components/Toggleable.jsx";
 
 function Notification({value}) {
   return <div className="notification">{value}</div>;
@@ -18,6 +19,7 @@ const App = () => {
   const [url, setUrl] = useState('')
   const [notification, setNotification] = useState(false)
   const [noteText, setNoteText] = useState('')
+  const blogFormRef = useRef(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -59,15 +61,18 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
-        <form onSubmit={handleLogin}>
-          <label htmlFor="username">username:</label>
-          <input type="text" name="username" id="username" onChange={({target}) => setUsername(target.value)} />
-          <br/>
-          <label htmlFor="password">password:</label>
-          <input type="password" name="password" id="password" onChange={({target}) => setPassword(target.value)} />
-          <br/>
-          <button>login</button>
-        </form>
+
+        <Toggleable label={"login"}>
+          <form onSubmit={handleLogin}>
+            <label htmlFor="username">username:</label>
+            <input type="text" name="username" id="username" onChange={({target}) => setUsername(target.value)} />
+            <br/>
+            <label htmlFor="password">password:</label>
+            <input type="password" name="password" id="password" onChange={({target}) => setPassword(target.value)} />
+            <br/>
+            <button>login</button>
+          </form>
+        </Toggleable>
       </div>
     )
   }
@@ -81,6 +86,7 @@ const App = () => {
         author: author,
         url: url
       })
+      blogFormRef.current.toggleVsible()
       setNotification(true)
       setNoteText(`a new blog ${title} by ${author} added`)
       setTitle('')
@@ -103,15 +109,17 @@ const App = () => {
         user &&
         <p>{user.username} logged in <button>logout</button></p>
       }
-      <div>
-        <h2>create new</h2>
-        <form onSubmit={handleCreate}>
-          <p>title:<input type="text" value={title} onChange={({target}) => setTitle(target.value)}/></p>
-          <p>author: <input type="text" value={author} onChange={({target}) => setAuthor(target.value)}/></p>
-          <p>url: <input type="text" value={url} onChange={({target}) => setUrl(target.value)}/></p>
-          <button>create</button>
-        </form>
-      </div>
+      <Toggleable label={"create new blog"} ref={blogFormRef}>
+        <div>
+          <h2>create new</h2>
+          <form onSubmit={handleCreate}>
+            <p>title:<input type="text" value={title} onChange={({target}) => setTitle(target.value)}/></p>
+            <p>author: <input type="text" value={author} onChange={({target}) => setAuthor(target.value)}/></p>
+            <p>url: <input type="text" value={url} onChange={({target}) => setUrl(target.value)}/></p>
+            <button>create</button>
+          </form>
+        </div>
+      </Toggleable>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog}/>
       )}
