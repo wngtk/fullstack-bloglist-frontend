@@ -4,11 +4,49 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
 import Toggleable from "./components/Toggleable.jsx";
+import * as PropTypes from "prop-types";
 
 function Notification({value}) {
   return <div className="notification">{value}</div>;
 }
 
+function BlogForm({createBlog}) {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('')
+
+  const handleTitleChange = ({target}) => { setTitle(target.value) }
+  const handleAuthorChange = ({target}) => { setAuthor(target.value) }
+  const handleUrlChange = ({target}) => { setUrl(target.value) }
+
+  const handleCreate = (event) => {
+    event.preventDefault()
+    createBlog({
+      title, author, url,
+    })
+    console.log("creating blog")
+  }
+
+  return <div>
+    <h2>create new</h2>
+    <form onSubmit={handleCreate}>
+      <p>title:<input type="text" value={title} onChange={handleTitleChange}/></p>
+      <p>author: <input type="text" value={author} onChange={handleAuthorChange}/></p>
+      <p>url: <input type="text" value={url} onChange={handleUrlChange}/></p>
+      <button>create</button>
+    </form>
+  </div>;
+}
+
+BlogForm.propTypes = {
+  onSubmit: PropTypes.func,
+  value: PropTypes.string,
+  onChange: PropTypes.func,
+  value1: PropTypes.string,
+  onChange1: PropTypes.func,
+  value2: PropTypes.string,
+  onChange2: PropTypes.func
+};
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
@@ -98,27 +136,28 @@ const App = () => {
     }
   }
 
+  const addBlog = (newBlog) => {
+    blogFormRef.current.toggleVsible()
+    blogService
+      .create(newBlog)
+      .then((returnedBlog) => {
+        setBlogs([...blogs, returnedBlog])
+      })
+  }
+
   return (
     <div>
       <h2>blogs</h2>
       {
         notification &&
-        <Notification value={noteText} />
+        <Notification value={noteText}/>
       }
       {
         user &&
         <p>{user.username} logged in <button>logout</button></p>
       }
       <Toggleable label={"create new blog"} ref={blogFormRef}>
-        <div>
-          <h2>create new</h2>
-          <form onSubmit={handleCreate}>
-            <p>title:<input type="text" value={title} onChange={({target}) => setTitle(target.value)}/></p>
-            <p>author: <input type="text" value={author} onChange={({target}) => setAuthor(target.value)}/></p>
-            <p>url: <input type="text" value={url} onChange={({target}) => setUrl(target.value)}/></p>
-            <button>create</button>
-          </form>
-        </div>
+        <BlogForm createBlog={addBlog} />
       </Toggleable>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog}/>
