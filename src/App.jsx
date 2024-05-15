@@ -58,9 +58,7 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs.sort((a, b) => {
-        return a.likes < b.likes ? 1 : -1
-      }) )
+      setBlogs( blogs )
     )
   }, [])
 
@@ -119,21 +117,29 @@ const App = () => {
     blogService
       .create(newBlog)
       .then((returnedBlog) => {
-        setBlogs([...blogs, returnedBlog].sort((b1, b2) => {
-          return b1.likes < b2.likes ? 1 : -1;
-        }))
+        setBlogs([...blogs, returnedBlog])
       })
   }
 
   const handleLike = async (id) => {
     setBlogs(blogs.map(blog => {
       return blog.id === id ? {...blog, likes: blog.likes + 1} : blog
-    }).sort((a, b) => {
-      return a.likes < b.likes ? 1 : -1;
     }))
     const returnBlog = await blogService.like(blogs.find(blog => blog.id === id))
     console.log("like", returnBlog);
   }
+
+  const removeBlog = async (blogToDelete) => {
+    if (blogToDelete.user.username !== user.username) {
+      return
+    }
+    const yes = window.confirm("Are you sure you want to delete this blog?")
+    if (!yes) return
+    await blogService.remove(blogToDelete)
+    setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
+  }
+
+  const sortedBlogs = [...blogs].sort((a, b) => { return a.likes < b.likes ? 1 : -1; })
 
   return (
     <div>
@@ -149,9 +155,13 @@ const App = () => {
       <Toggleable label={"create new blog"} ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Toggleable>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} onLikeClick={() => handleLike(blog.id)}/>
-      )}
+      {
+        sortedBlogs.map(blog =>
+          <Blog key={blog.id} blog={blog}
+                onLikeClick={() => handleLike(blog.id)}
+                onRemoveClick={() => removeBlog(blog)}/>
+        )
+      }
     </div>
   )
 }
