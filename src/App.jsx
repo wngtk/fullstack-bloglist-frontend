@@ -52,9 +52,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
   const [notification, setNotification] = useState(false)
   const [noteText, setNoteText] = useState('')
   const blogFormRef = useRef(null)
@@ -115,26 +112,26 @@ const App = () => {
     )
   }
 
-  async function handleCreate(e) {
-    e.preventDefault()
-    console.log('creating blog list', title, author, url)
-    try {
-      await blogService.create({
-        title: title,
-        author: author,
-        url: url
-      })
-      blogFormRef.current.toggleVsible()
-      setNotification(true)
-      setNoteText(`a new blog ${title} by ${author} added`)
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-      setTimeout(() => { setNotification(false) }, 3000)
-    } catch (e) {
-      console.log('creation fails', e)
-    }
-  }
+  // async function handleCreate(e) {
+  //   e.preventDefault()
+  //   console.log('creating blog list', title, author, url)
+  //   try {
+  //     await blogService.create({
+  //       title: title,
+  //       author: author,
+  //       url: url
+  //     })
+  //     blogFormRef.current.toggleVsible()
+  //     setNotification(true)
+  //     setNoteText(`a new blog ${title} by ${author} added`)
+  //     setTitle('')
+  //     setAuthor('')
+  //     setUrl('')
+  //     setTimeout(() => { setNotification(false) }, 3000)
+  //   } catch (e) {
+  //     console.log('creation fails', e)
+  //   }
+  // }
 
   const addBlog = (newBlog) => {
     blogFormRef.current.toggleVsible()
