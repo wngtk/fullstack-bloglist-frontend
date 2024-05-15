@@ -58,7 +58,9 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+      setBlogs( blogs.sort((a, b) => {
+        return a.likes < b.likes ? 1 : -1
+      }) )
     )
   }, [])
 
@@ -112,39 +114,22 @@ const App = () => {
     )
   }
 
-  // async function handleCreate(e) {
-  //   e.preventDefault()
-  //   console.log('creating blog list', title, author, url)
-  //   try {
-  //     await blogService.create({
-  //       title: title,
-  //       author: author,
-  //       url: url
-  //     })
-  //     blogFormRef.current.toggleVsible()
-  //     setNotification(true)
-  //     setNoteText(`a new blog ${title} by ${author} added`)
-  //     setTitle('')
-  //     setAuthor('')
-  //     setUrl('')
-  //     setTimeout(() => { setNotification(false) }, 3000)
-  //   } catch (e) {
-  //     console.log('creation fails', e)
-  //   }
-  // }
-
   const addBlog = (newBlog) => {
     blogFormRef.current.toggleVsible()
     blogService
       .create(newBlog)
       .then((returnedBlog) => {
-        setBlogs([...blogs, returnedBlog])
+        setBlogs([...blogs, returnedBlog].sort((b1, b2) => {
+          return b1.likes < b2.likes ? 1 : -1;
+        }))
       })
   }
 
   const handleLike = async (id) => {
     setBlogs(blogs.map(blog => {
       return blog.id === id ? {...blog, likes: blog.likes + 1} : blog
+    }).sort((a, b) => {
+      return a.likes < b.likes ? 1 : -1;
     }))
     const returnBlog = await blogService.like(blogs.find(blog => blog.id === id))
     console.log("like", returnBlog);
