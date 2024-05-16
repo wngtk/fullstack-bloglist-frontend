@@ -21,10 +21,10 @@ function BlogForm({createBlog}) {
   return <div>
     <h2>create new</h2>
     <form onSubmit={handleCreate}>
-      <p>title:<input type="text" value={title} onChange={handleTitleChange} placeholder="write blog title here"/></p>
-      <p>author: <input type="text" value={author} onChange={handleAuthorChange}/></p>
-      <p>url: <input type="text" value={url} onChange={handleUrlChange}/></p>
-      <button>create</button>
+      <p>title:<input id="blog-title" type="text" value={title} onChange={handleTitleChange} placeholder="write blog title here"/></p>
+      <p>author: <input id="blog-author" type="text" value={author} onChange={handleAuthorChange}/></p>
+      <p>url: <input id="blog-url" type="text" value={url} onChange={handleUrlChange}/></p>
+      <button id="create-blog-button">create</button>
     </form>
   </div>;
 }
