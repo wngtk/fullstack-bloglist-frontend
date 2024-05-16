@@ -13,9 +13,9 @@ const Blog = ({ blog, onLikeClick, onRemoveClick }) => {
       {
         show &&
         <div>
-          <p>{blog.url}</p>
-          <p>likes {blog.likes} <button onClick={onLikeClick}>like</button></p>
-          <p>{blog.author}</p>
+          <p className="url">{blog.url}</p>
+          <p className="likes">likes {blog.likes} <button onClick={onLikeClick}>like</button></p>
+          <p className="author">{blog.author}</p>
           <button onClick={onRemoveClick}>remove</button>
         </div>
       }
