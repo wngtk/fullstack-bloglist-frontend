@@ -68,7 +68,7 @@ const App = () => {
             <label htmlFor="password">password:</label>
             <input type="password" name="password" id="password" onChange={({target}) => setPassword(target.value)} />
             <br/>
-            <button>login</button>
+            <button id="login-button">login</button>
           </form>
         </Toggleable>
       </div>
