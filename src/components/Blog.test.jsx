@@ -39,3 +39,27 @@ test('after clicking view button, url and likes are displayed', async () => {
   const likes = container.querySelector('.likes')
   expect(likes).toHaveTextContent('20')
 })
+
+test('likes button can be clicked twice', async () => {
+  const blog = {
+    title: 'Hello World',
+    author: 'John Doe',
+    url: 'no url',
+    likes: 20
+  }
+
+  const mockHandler = vi.fn()
+
+  render(<Blog blog={blog} onLikeClick={mockHandler} />)
+
+
+  const view = screen.getByText('view')
+  const user = userEvent.setup()
+  await user.click(view)
+
+  const like = screen.getByText('like')
+  await user.click(like)
+  await user.click(like)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
+})
