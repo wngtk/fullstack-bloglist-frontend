@@ -19,3 +19,23 @@ test('<Blog />', async () => {
   const author = container.querySelector('.author')
   expect(author).toHaveTextContent('John Doe')
 })
+
+test('after clicking view button, url and likes are displayed', async () => {
+  const blog = {
+    title: 'Hello World',
+    author: 'John Doe',
+    url: 'no url',
+    likes: 20
+  }
+
+  const {container} = render(<Blog blog={blog} />)
+
+  const view = screen.getByText('view')
+  const user = userEvent.setup()
+  await user.click(view)
+
+  const url = container.querySelector('.url')
+  expect(url).toHaveTextContent('no url')
+  const likes = container.querySelector('.likes')
+  expect(likes).toHaveTextContent('20')
+})
