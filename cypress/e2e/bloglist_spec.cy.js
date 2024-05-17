@@ -5,6 +5,10 @@ describe('Blog app', function () {
       username: 'root',
       password: '123456',
     })
+    cy.request('POST', 'http://localhost:3003/api/users', {
+      username: 'hella',
+      password: 'hella'
+    })
     cy.visit('http://localhost:5173')
   })
 
@@ -36,10 +40,7 @@ describe('Blog app', function () {
 
   describe('When logged in', function () {
     beforeEach(function () {
-      cy.contains('login').click()
-      cy.get('input:first').type('root')
-      cy.get('input:last').type('123456')
-      cy.get('#login-button').click()      
+      cy.login({ username: 'root', password: '123456' })
     })
     
     it('A blog can be created', function () {
