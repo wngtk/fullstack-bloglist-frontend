@@ -94,11 +94,12 @@ const App = () => {
   }
 
   const removeBlog = async (blogToDelete) => {
+    console.log(blogToDelete, user)
     if (blogToDelete.user.username !== user.username) {
       return
     }
-    const yes = window.confirm("Are you sure you want to delete this blog?")
-    if (!yes) return
+    // const yes = window.confirm("Are you sure you want to delete this blog?")
+    // if (!yes) return
     await blogService.remove(blogToDelete)
     setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
   }
