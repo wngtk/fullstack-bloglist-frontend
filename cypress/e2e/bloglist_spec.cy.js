@@ -44,22 +44,22 @@ describe('Blog app', function () {
     })
     
     it('A blog can be created', function () {
-      cy.contains('create new blog').as('btn')
-      cy.get('@btn').click()
-      cy.get('#blog-title').type('a blog')
-      cy.get('#blog-author').type('root')
-      cy.get('#blog-url').type('no url')
-      cy.get('#create-blog-button').click()
+      cy.createBlog({
+        title: 'a blog',
+        author: 'root',
+        url: 'no url'
+      })
       cy.contains('a blog')
     })
 
     describe('and a blog exists', function () {
       beforeEach(() => {
-        cy.contains('create new blog').click()
-        cy.get('#blog-title').type('another blog')
-        cy.get('#blog-author').type('root')
-        cy.get('#blog-url').type('no url')
-        cy.get('#create-blog-button').click()
+        cy.createBlog({
+          title: 'another blog',
+          author: 'root',
+          url: 'no url'
+        })
+        cy.contains('another blog')
       })
 
       it('user can like a blog', function() {
