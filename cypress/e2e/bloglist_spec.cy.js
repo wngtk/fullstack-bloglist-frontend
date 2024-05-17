@@ -42,6 +42,27 @@ describe('Blog app', function () {
     beforeEach(function () {
       cy.login({ username: 'root', password: '123456' })
     })
+
+    describe('with two blog', function () {
+      it('ordered by likes', function () {
+        cy.createBlog({
+          title: 'The title with the second most likes',
+          author: 'second best author',
+          url: 'i am url'
+        })
+        cy.createBlog({
+          title: 'The title with the most likes',
+          author: 'best author',
+          url: 'i am url'
+        })
+
+        cy.contains('the most likes').parent().as('mostPopularBlog')
+        cy.get('@mostPopularBlog').contains('view').click()
+        cy.get('@mostPopularBlog').get('.likes').find('button').click()
+        cy.get('.blog-container').eq(0).should('contain', 'The title with the most likes')
+        cy.get('.blog-container').eq(1).should('contain', 'The title with the second most likes')
+      })
+    })
     
     it('A blog can be created', function () {
       cy.createBlog({
@@ -76,7 +97,7 @@ describe('Blog app', function () {
 
     })
     
-    it.only('only the creator can see the delete button', function () {
+    it('only the creator can see the delete button', function () {
       cy.createBlog({
       title: 'a blog created by root',
       author: 'root',
