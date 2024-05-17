@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Blog = ({ blog, onLikeClick, onRemoveClick }) => {
+const Blog = ({ blog, onLikeClick, onRemoveClick, removable }) => {
   const [show, setShow] = useState(false);
 
   const toggle = () => {
@@ -9,14 +9,17 @@ const Blog = ({ blog, onLikeClick, onRemoveClick }) => {
 
   return (
     <div className="blog-container">
-      {blog.title} <button onClick={toggle}>{ !show ? "view" : "hide" }</button>
+      <span>{blog.title}</span> <button onClick={toggle}>{ !show ? "view" : "hide" }</button>
       {
         show &&
         <div>
           <p className="url">{blog.url}</p>
           <p className="likes">likes {blog.likes} <button onClick={onLikeClick}>like</button></p>
           <p className="author">{blog.author}</p>
-          <button onClick={onRemoveClick}>remove</button>
+          {
+            removable &&
+            <button onClick={onRemoveClick}>remove</button>
+          }
         </div>
       }
     </div>

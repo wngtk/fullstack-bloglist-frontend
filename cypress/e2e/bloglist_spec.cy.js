@@ -73,6 +73,25 @@ describe('Blog app', function () {
         cy.contains('remove').click()
         cy.contains('another blog').should('not.exist')
       })
+
+    })
+    
+    it.only('only the creator can see the delete button', function () {
+      cy.createBlog({
+      title: 'a blog created by root',
+      author: 'root',
+        url: 'no url'
+      })
+      cy.login({ username: 'hella', password: 'hella' })
+      cy.contains('hella logged in')
+      cy.createBlog({
+        title: 'hella de bloig',
+        author: 'is hella',
+        url: 'cool url'
+      })
+      cy.contains('a blog created by root').parent().as('blogCreatedByRoot')
+      cy.get('@blogCreatedByRoot').contains('view').click()
+      cy.get('@blogCreatedByRoot').contains('remove').should('not.exist')
     })
   })
 })

@@ -124,7 +124,8 @@ const App = () => {
         sortedBlogs.map(blog =>
           <Blog key={blog.id} blog={blog}
                 onLikeClick={() => handleLike(blog.id)}
-                onRemoveClick={() => removeBlog(blog)}/>
+                onRemoveClick={() => removeBlog(blog)}
+                removable={blog.user.username === user.username}/>
         )
       }
     </div>
