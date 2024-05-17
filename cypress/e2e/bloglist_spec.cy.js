@@ -49,6 +49,7 @@ describe('Blog app', function () {
       cy.get('#blog-author').type('root')
       cy.get('#blog-url').type('no url')
       cy.get('#create-blog-button').click()
+      cy.contains('a blog')
     })
 
     describe('and a blog exists', function () {
@@ -60,7 +61,7 @@ describe('Blog app', function () {
         cy.get('#create-blog-button').click()
       })
 
-      it.only('user can like a blog', function() {
+      it('user can like a blog', function() {
         cy.contains('view').click()
         cy.contains('like').click()
       })
