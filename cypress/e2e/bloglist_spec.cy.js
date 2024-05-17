@@ -64,6 +64,13 @@ describe('Blog app', function () {
       it('user can like a blog', function() {
         cy.contains('view').click()
         cy.contains('like').click()
+        cy.contains('likes 1')
+      })
+
+      it('user can delete a blog', function () {
+        cy.contains('view').click()
+        cy.contains('remove').click()
+        cy.contains('another blog').should('not.exist')
       })
     })
   })
