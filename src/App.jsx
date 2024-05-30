@@ -6,13 +6,12 @@ import './index.css'
 import Toggleable from './components/Toggleable.jsx'
 import BlogForm from './components/BlogForm.jsx'
 import NotificationContext from './NotificationContext.jsx'
-import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 function Notification() {
   const [notification] = useContext(NotificationContext)
 
-  if (!notification)
-    return null
+  if (!notification) return null
 
   return <div className="notification">{notification}</div>
 }
@@ -23,11 +22,11 @@ const App = () => {
   const [password, setPassword] = useState('')
   const blogFormRef = useRef(null)
 
-  const [,notificationDispatch] = useContext(NotificationContext)
+  const [, notificationDispatch] = useContext(NotificationContext)
 
   const result = useQuery({
     queryKey: ['blogs'],
-    queryFn: blogService.getAll
+    queryFn: blogService.getAll,
   })
   const queryClient = useQueryClient()
   const newBlogMutation = useMutation({
@@ -36,7 +35,24 @@ const App = () => {
       // queryClient.invalidateQueries({ queryKey: ['blogs'] })
       const blogs = queryClient.getQueryData(['blogs'])
       queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
-    }
+    },
+  })
+  const likeBlogMutation = useMutation({
+    mutationFn: blogService.like,
+  })
+  const deleteBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: (removedBlog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+
+      console.log(removedBlog)
+      console.log(blogs.filter((b) => b.id !== removedBlog.id))
+      queryClient.setQueryData(
+        ['blogs'],
+        // blogs.filter(b => b.id !== removedBlog.id)
+        blogs
+      )
+    },
   })
 
   const blogs = result.data
@@ -68,7 +84,10 @@ const App = () => {
       setPassword('')
     } catch (e) {
       console.log('Wrong credentials', e)
-      notificationDispatch({ type: 'SET_NOTIFICATION', payload: 'wrong username or password' })
+      notificationDispatch({
+        type: 'SET_NOTIFICATION',
+        payload: 'wrong username or password',
+      })
     }
   }
 
@@ -106,22 +125,11 @@ const App = () => {
 
   const addBlog = (newBlog) => {
     blogFormRef.current.toggleVsible()
-    // blogService.create(newBlog).then((returnedBlog) => {
-    //   setBlogs([...blogs, returnedBlog])
-    // })
     newBlogMutation.mutate({ ...newBlog })
   }
 
-  const handleLike = async (id) => {
-    setBlogs(
-      blogs.map((blog) => {
-        return blog.id === id ? { ...blog, likes: blog.likes + 1 } : blog
-      })
-    )
-    const returnBlog = await blogService.like(
-      blogs.find((blog) => blog.id === id)
-    )
-    console.log('like', returnBlog)
+  const handleLike = async (blog) => {
+    likeBlogMutation.mutate(blog)
   }
 
   const removeBlog = async (blogToDelete) => {
@@ -129,10 +137,11 @@ const App = () => {
     if (blogToDelete.user.username !== user.username) {
       return
     }
-    // const yes = window.confirm("Are you sure you want to delete this blog?")
-    // if (!yes) return
-    await blogService.remove(blogToDelete)
-    setBlogs(blogs.filter((blog) => blog.id !== blogToDelete.id))
+    deleteBlogMutation.mutate(blogToDelete)
+    queryClient.setQueryData(
+      ['blogs'],
+      blogs.filter((b) => b.id !== blogToDelete.id)
+    )
   }
 
   const sortedBlogs = [...blogs].sort((a, b) => {
@@ -142,7 +151,6 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      {/* {notification && <Notification value={noteText} />} */}
       <Notification />
       {user && (
         <p>
@@ -156,7 +164,7 @@ const App = () => {
         <Blog
           key={blog.id}
           blog={blog}
-          onLikeClick={() => handleLike(blog.id)}
+          onLikeClick={() => handleLike(blog)}
           onRemoveClick={() => removeBlog(blog)}
           removable={blog.user.username === user.username}
         />
