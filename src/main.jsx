@@ -3,7 +3,7 @@ import App from './App'
 import { NotificationContextProvider } from './NotificationContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { UserContextProvider } from './UserContext'
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom'
+import { BrowserRouter as Router } from 'react-router-dom'
 
 const queryClient = new QueryClient()
 

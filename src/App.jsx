@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useReducer, useRef, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
@@ -20,7 +20,25 @@ function Notification() {
   return <div className="notification">{notification}</div>
 }
 
+const commentsReducer = (state, action) => {
+  switch (action.type) {
+    case 'ADD_COMMENT':
+      if (state[action.payload.id]) {
+        return {
+          ...state,
+          [action.payload.id]: [
+            ...state[action.payload.id],
+            action.payload.comment,
+          ],
+        }
+      } else {
+        return { [action.payload.id]: [action.payload.comment] }
+      }
+  }
+}
+
 const App = () => {
+  const [comments, commentsDispatch] = useReducer(commentsReducer, {})
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const blogFormRef = useRef(null)
@@ -137,19 +155,27 @@ const App = () => {
   )
 
   const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
+  const blogComments = match ? comments[blog.id] : null
 
   const padding = {
-    paddingRight: 5
+    paddingRight: 5,
   }
 
   return (
     <div>
       <h2>blogs</h2>
       <nav>
-        <Link to={'/'} style={padding}>blogs</Link>
-        <Link to={'/users'} style={padding}>users</Link>
+        <Link to={'/'} style={padding}>
+          blogs
+        </Link>
+        <Link to={'/users'} style={padding}>
+          users
+        </Link>
         {user && (
-            <span><span style={{fontWeight: "bold"}}>{user.username}</span> logged in <button>logout</button></span>
+          <span>
+            <span style={{ fontWeight: 'bold' }}>{user.username}</span> logged
+            in <button>logout</button>
+          </span>
         )}
       </nav>
       <Notification />
@@ -158,7 +184,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="users" element={<Users />} />
         <Route path="users/:id" element={<User />} />
-        <Route path="blogs/:id" element={<Blog blog={blog} />} />
+        <Route path="blogs/:id" element={<Blog blog={blog} blogComments={blogComments} commentsDispatch={commentsDispatch} />} />
       </Routes>
     </div>
   )

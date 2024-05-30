@@ -3,10 +3,11 @@ import { useContext, useState } from 'react'
 import UserContext from '../UserContext'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog, removable }) => {
+const Blog = ({ blog, blogComments, commentsDispatch }) => {
   const [show, setShow] = useState(false)
   const [user] = useContext(UserContext)
   const queryClient = useQueryClient()
+  const [comment, setComment] = useState('')
 
   const toggle = () => {
     setShow(!show)
@@ -45,11 +46,18 @@ const Blog = ({ blog, removable }) => {
     deleteBlogMutation.mutate(blog)
   }
 
+  const handleAddComment = () => {
+    commentsDispatch({ type: 'ADD_COMMENT', payload: { id: blog.id, comment } })
+    setComment('')
+  }
+
   return (
     <div className="blog-container">
       <h1>{blog.title}</h1>
       <div>
-        <a className="url" href={blog.url}>{blog.url}</a>
+        <a className="url" href={blog.url}>
+          {blog.url}
+        </a>
         <p className="likes">
           likes {blog.likes} <button onClick={handleLike}>like</button>
         </p>
@@ -58,9 +66,16 @@ const Blog = ({ blog, removable }) => {
           <button onClick={removeBlog}>remove</button>
         )}
       </div>
-      <h6>comments</h6>
+      <h4>comments</h4>
+      <input
+        type="text"
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+      />
+      <button onClick={handleAddComment}>add comment</button>
       <ul>
-        
+        {blogComments &&
+          blogComments.map((comment, index) => <li key={index}>{comment}</li>)}
       </ul>
     </div>
   )
