@@ -8,7 +8,7 @@ import BlogForm from './components/BlogForm.jsx'
 import NotificationContext from './NotificationContext.jsx'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import UserContext from './UserContext.jsx'
-import { Route, Routes } from 'react-router-dom'
+import { Link, Route, Routes, useMatch } from 'react-router-dom'
 import Users from './components/Users.jsx'
 import User from './components/User.jsx'
 
@@ -36,22 +36,8 @@ const App = () => {
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
     onSuccess: (newBlog) => {
-      // queryClient.invalidateQueries({ queryKey: ['blogs'] })
       const blogs = queryClient.getQueryData(['blogs'])
       queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
-    },
-  })
-  const likeBlogMutation = useMutation({
-    mutationFn: blogService.like,
-  })
-  const deleteBlogMutation = useMutation({
-    mutationFn: blogService.remove,
-    onSuccess: (_, removedBlog) => {
-      const blogs = queryClient.getQueryData(['blogs'])
-      queryClient.setQueryData(
-        ['blogs'],
-        blogs.filter((b) => b.id !== removedBlog.id)
-      )
     },
   })
 
@@ -65,6 +51,8 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  const match = useMatch('/blogs/:id')
 
   if (result.isLoading) return null
 
@@ -128,18 +116,6 @@ const App = () => {
     newBlogMutation.mutate({ ...newBlog })
   }
 
-  const handleLike = async (blog) => {
-    likeBlogMutation.mutate(blog)
-  }
-
-  const removeBlog = async (blogToDelete) => {
-    console.log(blogToDelete, user)
-    if (blogToDelete.user.username !== user.username) {
-      return
-    }
-    deleteBlogMutation.mutate(blogToDelete)
-  }
-
   const sortedBlogs = [...blogs].sort((a, b) => {
     return a.likes < b.likes ? 1 : -1
   })
@@ -150,16 +126,17 @@ const App = () => {
         <BlogForm createBlog={addBlog} />
       </Toggleable>
       {sortedBlogs.map((blog) => (
-        <Blog
+        <div
+          style={{ padding: '8px', border: 'solid 1px black', margin: '8px' }}
           key={blog.id}
-          blog={blog}
-          onLikeClick={() => handleLike(blog)}
-          onRemoveClick={() => removeBlog(blog)}
-          removable={blog.user.username === user.username}
-        />
+        >
+          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+        </div>
       ))}
     </>
   )
+
+  const blog = match ? blogs.find(blog => blog.id === match.params.id) : null
 
   return (
     <div>
@@ -175,6 +152,7 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="users" element={<Users />} />
         <Route path="users/:id" element={<User />} />
+        <Route path="blogs/:id" element={<Blog blog={blog} />} />
       </Routes>
     </div>
   )
