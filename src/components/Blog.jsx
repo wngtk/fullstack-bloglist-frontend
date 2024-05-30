@@ -58,6 +58,10 @@ const Blog = ({ blog, removable }) => {
           <button onClick={removeBlog}>remove</button>
         )}
       </div>
+      <h6>comments</h6>
+      <ul>
+        
+      </ul>
     </div>
   )
 }
