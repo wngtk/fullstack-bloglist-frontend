@@ -1,13 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
 import Toggleable from './components/Toggleable.jsx'
 import BlogForm from './components/BlogForm.jsx'
+import NotificationContext from './NotificationContext.jsx'
 
-function Notification({ value }) {
-  return <div className="notification">{value}</div>
+function Notification() {
+  const [notification] = useContext(NotificationContext)
+
+  if (!notification)
+    return null
+
+  return <div className="notification">{notification}</div>
 }
 
 const App = () => {
@@ -15,9 +21,9 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [notification, setNotification] = useState(false)
-  const [noteText, setNoteText] = useState('')
   const blogFormRef = useRef(null)
+
+  const [,notificationDispatch] = useContext(NotificationContext)
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -48,11 +54,7 @@ const App = () => {
       setPassword('')
     } catch (e) {
       console.log('Wrong credentials', e)
-      setNotification(true)
-      setNoteText('wrong username or password')
-      setTimeout(() => {
-        setNotification(false)
-      }, 3000)
+      notificationDispatch({ type: 'SET_NOTIFICATION', payload: 'wrong username or password' })
     }
   }
 
@@ -60,6 +62,8 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
+
+        <Notification />
 
         <Toggleable label={'login'}>
           <form onSubmit={handleLogin}>
@@ -123,7 +127,8 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      {notification && <Notification value={noteText} />}
+      {/* {notification && <Notification value={noteText} />} */}
+      <Notification />
       {user && (
         <p>
           {user.username} logged in <button>logout</button>
