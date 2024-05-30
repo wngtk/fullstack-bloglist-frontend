@@ -8,6 +8,8 @@ import BlogForm from './components/BlogForm.jsx'
 import NotificationContext from './NotificationContext.jsx'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import UserContext from './UserContext.jsx'
+import { Route, Routes } from 'react-router-dom'
+import Users from './components/Users.jsx'
 
 function Notification() {
   const [notification] = useContext(NotificationContext)
@@ -141,15 +143,8 @@ const App = () => {
     return a.likes < b.likes ? 1 : -1
   })
 
-  return (
-    <div>
-      <h2>blogs</h2>
-      <Notification />
-      {user && (
-        <p>
-          {user.username} logged in <button>logout</button>
-        </p>
-      )}
+  const Home = () => (
+    <>
       <Toggleable label={'create new blog'} ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Toggleable>
@@ -162,6 +157,23 @@ const App = () => {
           removable={blog.user.username === user.username}
         />
       ))}
+    </>
+  )
+
+  return (
+    <div>
+      <h2>blogs</h2>
+      <Notification />
+      {user && (
+        <p>
+          {user.username} logged in <button>logout</button>
+        </p>
+      )}
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="users" element={<Users />} />
+      </Routes>
     </div>
   )
 }
