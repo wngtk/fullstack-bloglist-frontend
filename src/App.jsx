@@ -42,15 +42,11 @@ const App = () => {
   })
   const deleteBlogMutation = useMutation({
     mutationFn: blogService.remove,
-    onSuccess: (removedBlog) => {
+    onSuccess: (_, removedBlog) => {
       const blogs = queryClient.getQueryData(['blogs'])
-
-      console.log(removedBlog)
-      console.log(blogs.filter((b) => b.id !== removedBlog.id))
       queryClient.setQueryData(
         ['blogs'],
-        // blogs.filter(b => b.id !== removedBlog.id)
-        blogs
+        blogs.filter(b => b.id !== removedBlog.id)
       )
     },
   })
@@ -138,10 +134,6 @@ const App = () => {
       return
     }
     deleteBlogMutation.mutate(blogToDelete)
-    queryClient.setQueryData(
-      ['blogs'],
-      blogs.filter((b) => b.id !== blogToDelete.id)
-    )
   }
 
   const sortedBlogs = [...blogs].sort((a, b) => {
