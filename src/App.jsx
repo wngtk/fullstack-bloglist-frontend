@@ -136,17 +136,23 @@ const App = () => {
     </>
   )
 
-  const blog = match ? blogs.find(blog => blog.id === match.params.id) : null
+  const blog = match ? blogs.find((blog) => blog.id === match.params.id) : null
+
+  const padding = {
+    paddingRight: 5
+  }
 
   return (
     <div>
       <h2>blogs</h2>
+      <nav>
+        <Link to={'/'} style={padding}>blogs</Link>
+        <Link to={'/users'} style={padding}>users</Link>
+        {user && (
+            <span><span style={{fontWeight: "bold"}}>{user.username}</span> logged in <button>logout</button></span>
+        )}
+      </nav>
       <Notification />
-      {user && (
-        <p>
-          {user.username} logged in <button>logout</button>
-        </p>
-      )}
 
       <Routes>
         <Route path="/" element={<Home />} />
