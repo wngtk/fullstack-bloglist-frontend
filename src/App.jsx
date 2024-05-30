@@ -8,6 +8,7 @@ import BlogForm from './components/BlogForm.jsx'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer.js'
 import { createBlog, deleteBlog, initialBlogs, likeBlog } from './reducers/blogReducer.js'
+import { login, setUser } from './reducers/userReducer.js'
 
 function Notification() {
   const notification = useSelector(state => state.notification)
@@ -20,11 +21,11 @@ function Notification() {
 }
 
 const App = () => {
-  const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const blogFormRef = useRef(null)
   const blogs = useSelector(state => state.blogs)
+  const user = useSelector(state => state.user)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -35,8 +36,8 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('blogListsLoggedUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
       blogService.setToken(user.token)
+      dispatch(setUser(user))
     }
   }, [])
 
@@ -45,12 +46,13 @@ const App = () => {
     console.log('logging in with', username, password)
 
     try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-      window.localStorage.setItem('blogListsLoggedUser', JSON.stringify(user))
-      blogService.setToken(user.token)
+      // const user = await loginService.login({
+      //   username,
+      //   password,
+      // })
+      // window.localStorage.setItem('blogListsLoggedUser', JSON.stringify(user))
+      // blogService.setToken(user.token)
+      dispatch(login({ username, password }))
       setUser(user)
       setUsername('')
       setPassword('')
@@ -114,7 +116,7 @@ const App = () => {
       <Notification />
       {user && (
         <p>
-          {user.username} logged in <button>logout</button>
+          {user.username} logged in <button onClick={() => { window.localStorage.clear();dispatch(setUser(null))}}>logout</button>
         </p>
       )}
       <Toggleable label={'create new blog'} ref={blogFormRef}>
