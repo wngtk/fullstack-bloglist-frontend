@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import UserContext from './UserContext.jsx'
 import { Route, Routes } from 'react-router-dom'
 import Users from './components/Users.jsx'
+import User from './components/User.jsx'
 
 function Notification() {
   const [notification] = useContext(NotificationContext)
@@ -173,6 +174,7 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="users" element={<Users />} />
+        <Route path="users/:id" element={<User />} />
       </Routes>
     </div>
   )

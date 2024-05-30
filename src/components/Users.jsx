@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 
 const Users = () => {
   const [users, setUsers] = useState([])
@@ -20,7 +21,7 @@ const Users = () => {
         <tbody>
           {users.map((u) => (
             <tr key={u.username}>
-              <td>{u.username}</td>
+              <td><Link to={`/users/${u.id}`}>{u.username}</Link></td>
               <td>{u.blogs.length}</td>
             </tr>
           ))}
