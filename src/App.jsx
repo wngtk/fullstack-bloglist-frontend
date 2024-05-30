@@ -7,6 +7,7 @@ import Toggleable from './components/Toggleable.jsx'
 import BlogForm from './components/BlogForm.jsx'
 import NotificationContext from './NotificationContext.jsx'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import UserContext from './UserContext.jsx'
 
 function Notification() {
   const [notification] = useContext(NotificationContext)
@@ -17,12 +18,12 @@ function Notification() {
 }
 
 const App = () => {
-  const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const blogFormRef = useRef(null)
 
   const [, notificationDispatch] = useContext(NotificationContext)
+  const [user, userDispatch] = useContext(UserContext)
 
   const result = useQuery({
     queryKey: ['blogs'],
@@ -46,7 +47,7 @@ const App = () => {
       const blogs = queryClient.getQueryData(['blogs'])
       queryClient.setQueryData(
         ['blogs'],
-        blogs.filter(b => b.id !== removedBlog.id)
+        blogs.filter((b) => b.id !== removedBlog.id)
       )
     },
   })
@@ -57,7 +58,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('blogListsLoggedUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      userDispatch({ type: 'SET_USER', payload: user })
       blogService.setToken(user.token)
     }
   }, [])
@@ -75,7 +76,7 @@ const App = () => {
       })
       window.localStorage.setItem('blogListsLoggedUser', JSON.stringify(user))
       blogService.setToken(user.token)
-      setUser(user)
+      userDispatch({ type: 'SET_USER', payload: user })
       setUsername('')
       setPassword('')
     } catch (e) {
