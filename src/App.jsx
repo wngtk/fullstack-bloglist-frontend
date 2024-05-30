@@ -162,7 +162,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div className="container">
       <h2>blogs</h2>
       <nav>
         <Link to={'/'} style={padding}>
@@ -184,7 +184,16 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="users" element={<Users />} />
         <Route path="users/:id" element={<User />} />
-        <Route path="blogs/:id" element={<Blog blog={blog} blogComments={blogComments} commentsDispatch={commentsDispatch} />} />
+        <Route
+          path="blogs/:id"
+          element={
+            <Blog
+              blog={blog}
+              blogComments={blogComments}
+              commentsDispatch={commentsDispatch}
+            />
+          }
+        />
       </Routes>
     </div>
   )
