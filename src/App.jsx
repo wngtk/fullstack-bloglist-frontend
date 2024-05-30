@@ -11,6 +11,7 @@ import UserContext from './UserContext.jsx'
 import { Link, Route, Routes, useMatch } from 'react-router-dom'
 import Users from './components/Users.jsx'
 import User from './components/User.jsx'
+import { Button, Card, CardBody, Container, Nav, Navbar, Stack } from 'react-bootstrap'
 
 function Notification() {
   const [notification] = useContext(NotificationContext)
@@ -143,14 +144,15 @@ const App = () => {
       <Toggleable label={'create new blog'} ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Toggleable>
-      {sortedBlogs.map((blog) => (
-        <div
-          style={{ padding: '8px', border: 'solid 1px black', margin: '8px' }}
-          key={blog.id}
-        >
-          <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-        </div>
-      ))}
+      <Stack gap={2}>
+        {sortedBlogs.map((blog) => (
+          <Card key={blog.id}>
+            <CardBody>
+              <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+            </CardBody>
+          </Card>
+        ))}
+      </Stack>
     </>
   )
 
@@ -164,20 +166,31 @@ const App = () => {
   return (
     <div className="container">
       <h2>blogs</h2>
-      <nav>
-        <Link to={'/'} style={padding}>
-          blogs
-        </Link>
-        <Link to={'/users'} style={padding}>
-          users
-        </Link>
-        {user && (
-          <span>
-            <span style={{ fontWeight: 'bold' }}>{user.username}</span> logged
-            in <button>logout</button>
-          </span>
-        )}
-      </nav>
+      <Navbar expand="lg" className="bg-body-tertiary">
+        <Container>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="me-auto">
+              <Nav.Link as="span">
+                <Link to={'/'} style={padding}>
+                  blogs
+                </Link>
+              </Nav.Link>
+              <Nav.Link as="span">
+                <Link to={'/users'} style={padding}>
+                  users
+                </Link>
+              </Nav.Link>
+            </Nav>
+            {user && (
+              <span>
+                <span style={{ fontWeight: 'bold' }}>{user.username}</span>{' '}
+                logged in <Button variant='outline-danger'>logout</Button>
+              </span>
+            )}
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
       <Notification />
 
       <Routes>

@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useContext, useState } from 'react'
 import UserContext from '../UserContext'
 import blogService from '../services/blogs'
+import { Button, Col, Form, InputGroup } from 'react-bootstrap'
 
 const Blog = ({ blog, blogComments, commentsDispatch }) => {
   const [show, setShow] = useState(false)
@@ -59,20 +60,29 @@ const Blog = ({ blog, blogComments, commentsDispatch }) => {
           {blog.url}
         </a>
         <p className="likes">
-          likes {blog.likes} <button onClick={handleLike}>like</button>
+          likes {blog.likes}{' '}
+          <Button variant="info" onClick={handleLike}>
+            like
+          </Button>
         </p>
         <p className="author">{blog.author}</p>
         {blog.user.username === user.username && (
-          <button onClick={removeBlog}>remove</button>
+          <Button variant="danger" onClick={removeBlog}>
+            remove
+          </Button>
         )}
       </div>
       <h4>comments</h4>
-      <input
-        type="text"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
-      <button onClick={handleAddComment}>add comment</button>
+      <Col md="7">
+        <InputGroup className="mb-3">
+          <Form.Control
+            type="text"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <Button onClick={handleAddComment}>add comment</Button>
+        </InputGroup>
+      </Col>
       <ul>
         {blogComments &&
           blogComments.map((comment, index) => <li key={index}>{comment}</li>)}
