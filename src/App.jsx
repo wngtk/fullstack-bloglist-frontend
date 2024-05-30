@@ -7,6 +7,7 @@ import Toggleable from './components/Toggleable.jsx'
 import BlogForm from './components/BlogForm.jsx'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer.js'
+import { createBlog, deleteBlog, initialBlogs, likeBlog } from './reducers/blogReducer.js'
 
 function Notification() {
   const notification = useSelector(state => state.notification)
@@ -19,15 +20,15 @@ function Notification() {
 }
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const blogFormRef = useRef(null)
+  const blogs = useSelector(state => state.blogs)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
+    dispatch(initialBlogs())
   }, [])
 
   useEffect(() => {
@@ -92,32 +93,15 @@ const App = () => {
 
   const addBlog = (newBlog) => {
     blogFormRef.current.toggleVsible()
-    blogService.create(newBlog).then((returnedBlog) => {
-      setBlogs([...blogs, returnedBlog])
-    })
+    dispatch(createBlog(newBlog))
   }
 
   const handleLike = async (id) => {
-    setBlogs(
-      blogs.map((blog) => {
-        return blog.id === id ? { ...blog, likes: blog.likes + 1 } : blog
-      })
-    )
-    const returnBlog = await blogService.like(
-      blogs.find((blog) => blog.id === id)
-    )
-    console.log('like', returnBlog)
+    dispatch(likeBlog(id))
   }
 
   const removeBlog = async (blogToDelete) => {
-    console.log(blogToDelete, user)
-    if (blogToDelete.user.username !== user.username) {
-      return
-    }
-    // const yes = window.confirm("Are you sure you want to delete this blog?")
-    // if (!yes) return
-    await blogService.remove(blogToDelete)
-    setBlogs(blogs.filter((blog) => blog.id !== blogToDelete.id))
+    dispatch(deleteBlog(blogToDelete))
   }
 
   const sortedBlogs = [...blogs].sort((a, b) => {
