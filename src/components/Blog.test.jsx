@@ -1,16 +1,16 @@
-import Blog from "./Blog";
-import {screen, render} from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+import Blog from './Blog'
+import { screen, render } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 test('<Blog />', async () => {
   const blog = {
     title: 'Hello World',
     author: 'John Doe',
     url: 'no url',
-    likes: 0
+    likes: 0,
   }
 
-  const {container } = render(<Blog blog={blog} />)
+  const { container } = render(<Blog blog={blog} />)
 
   const viewButton = screen.getByText('view')
   const user = userEvent.setup()
@@ -25,10 +25,10 @@ test('after clicking view button, url and likes are displayed', async () => {
     title: 'Hello World',
     author: 'John Doe',
     url: 'no url',
-    likes: 20
+    likes: 20,
   }
 
-  const {container} = render(<Blog blog={blog} />)
+  const { container } = render(<Blog blog={blog} />)
 
   const view = screen.getByText('view')
   const user = userEvent.setup()
@@ -45,13 +45,12 @@ test('likes button can be clicked twice', async () => {
     title: 'Hello World',
     author: 'John Doe',
     url: 'no url',
-    likes: 20
+    likes: 20,
   }
 
   const mockHandler = vi.fn()
 
   render(<Blog blog={blog} onLikeClick={mockHandler} />)
-
 
   const view = screen.getByText('view')
   const user = userEvent.setup()

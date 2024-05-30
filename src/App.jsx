@@ -1,13 +1,13 @@
-import {useEffect, useRef, useState} from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import './index.css'
-import Toggleable from "./components/Toggleable.jsx";
-import BlogForm from "./components/BlogForm.jsx";
+import Toggleable from './components/Toggleable.jsx'
+import BlogForm from './components/BlogForm.jsx'
 
-function Notification({value}) {
-  return <div className="notification">{value}</div>;
+function Notification({ value }) {
+  return <div className="notification">{value}</div>
 }
 
 const App = () => {
@@ -20,9 +20,7 @@ const App = () => {
   const blogFormRef = useRef(null)
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
-      setBlogs( blogs )
-    )
+    blogService.getAll().then((blogs) => setBlogs(blogs))
   }, [])
 
   useEffect(() => {
@@ -32,7 +30,7 @@ const App = () => {
       setUser(user)
       blogService.setToken(user.token)
     }
-  }, []);
+  }, [])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -41,7 +39,7 @@ const App = () => {
     try {
       const user = await loginService.login({
         username,
-        password
+        password,
       })
       window.localStorage.setItem('blogListsLoggedUser', JSON.stringify(user))
       blogService.setToken(user.token)
@@ -52,7 +50,9 @@ const App = () => {
       console.log('Wrong credentials', e)
       setNotification(true)
       setNoteText('wrong username or password')
-      setTimeout(() => { setNotification(false) }, 3000)
+      setTimeout(() => {
+        setNotification(false)
+      }, 3000)
     }
   }
 
@@ -61,14 +61,24 @@ const App = () => {
       <div>
         <h2>Log in to application</h2>
 
-        <Toggleable label={"login"}>
+        <Toggleable label={'login'}>
           <form onSubmit={handleLogin}>
             <label htmlFor="username">username:</label>
-            <input type="text" name="username" id="username" onChange={({target}) => setUsername(target.value)} />
-            <br/>
+            <input
+              type="text"
+              name="username"
+              id="username"
+              onChange={({ target }) => setUsername(target.value)}
+            />
+            <br />
             <label htmlFor="password">password:</label>
-            <input type="password" name="password" id="password" onChange={({target}) => setPassword(target.value)} />
-            <br/>
+            <input
+              type="password"
+              name="password"
+              id="password"
+              onChange={({ target }) => setPassword(target.value)}
+            />
+            <br />
             <button id="login-button">login</button>
           </form>
         </Toggleable>
@@ -78,19 +88,21 @@ const App = () => {
 
   const addBlog = (newBlog) => {
     blogFormRef.current.toggleVsible()
-    blogService
-      .create(newBlog)
-      .then((returnedBlog) => {
-        setBlogs([...blogs, returnedBlog])
-      })
+    blogService.create(newBlog).then((returnedBlog) => {
+      setBlogs([...blogs, returnedBlog])
+    })
   }
 
   const handleLike = async (id) => {
-    setBlogs(blogs.map(blog => {
-      return blog.id === id ? {...blog, likes: blog.likes + 1} : blog
-    }))
-    const returnBlog = await blogService.like(blogs.find(blog => blog.id === id))
-    console.log("like", returnBlog);
+    setBlogs(
+      blogs.map((blog) => {
+        return blog.id === id ? { ...blog, likes: blog.likes + 1 } : blog
+      })
+    )
+    const returnBlog = await blogService.like(
+      blogs.find((blog) => blog.id === id)
+    )
+    console.log('like', returnBlog)
   }
 
   const removeBlog = async (blogToDelete) => {
@@ -101,33 +113,34 @@ const App = () => {
     // const yes = window.confirm("Are you sure you want to delete this blog?")
     // if (!yes) return
     await blogService.remove(blogToDelete)
-    setBlogs(blogs.filter(blog => blog.id !== blogToDelete.id))
+    setBlogs(blogs.filter((blog) => blog.id !== blogToDelete.id))
   }
 
-  const sortedBlogs = [...blogs].sort((a, b) => { return a.likes < b.likes ? 1 : -1; })
+  const sortedBlogs = [...blogs].sort((a, b) => {
+    return a.likes < b.likes ? 1 : -1
+  })
 
   return (
     <div>
       <h2>blogs</h2>
-      {
-        notification &&
-        <Notification value={noteText}/>
-      }
-      {
-        user &&
-        <p>{user.username} logged in <button>logout</button></p>
-      }
-      <Toggleable label={"create new blog"} ref={blogFormRef}>
+      {notification && <Notification value={noteText} />}
+      {user && (
+        <p>
+          {user.username} logged in <button>logout</button>
+        </p>
+      )}
+      <Toggleable label={'create new blog'} ref={blogFormRef}>
         <BlogForm createBlog={addBlog} />
       </Toggleable>
-      {
-        sortedBlogs.map(blog =>
-          <Blog key={blog.id} blog={blog}
-                onLikeClick={() => handleLike(blog.id)}
-                onRemoveClick={() => removeBlog(blog)}
-                removable={blog.user.username === user.username}/>
-        )
-      }
+      {sortedBlogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          onLikeClick={() => handleLike(blog.id)}
+          onRemoveClick={() => removeBlog(blog)}
+          removable={blog.user.username === user.username}
+        />
+      ))}
     </div>
   )
 }
