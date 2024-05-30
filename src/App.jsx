@@ -6,6 +6,7 @@ import './index.css'
 import Toggleable from './components/Toggleable.jsx'
 import BlogForm from './components/BlogForm.jsx'
 import NotificationContext from './NotificationContext.jsx'
+import { QueryClient, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 function Notification() {
   const [notification] = useContext(NotificationContext)
@@ -17,7 +18,6 @@ function Notification() {
 }
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [user, setUser] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -25,9 +25,21 @@ const App = () => {
 
   const [,notificationDispatch] = useContext(NotificationContext)
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll
+  })
+  const queryClient = useQueryClient()
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      // queryClient.invalidateQueries({ queryKey: ['blogs'] })
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+    }
+  })
+
+  const blogs = result.data
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('blogListsLoggedUser')
@@ -37,6 +49,8 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
+
+  if (result.isLoading) return null
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -92,9 +106,10 @@ const App = () => {
 
   const addBlog = (newBlog) => {
     blogFormRef.current.toggleVsible()
-    blogService.create(newBlog).then((returnedBlog) => {
-      setBlogs([...blogs, returnedBlog])
-    })
+    // blogService.create(newBlog).then((returnedBlog) => {
+    //   setBlogs([...blogs, returnedBlog])
+    // })
+    newBlogMutation.mutate({ ...newBlog })
   }
 
   const handleLike = async (id) => {
